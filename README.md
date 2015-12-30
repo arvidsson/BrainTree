@@ -41,6 +41,16 @@ int main()
     BehaviorTree tree;
     auto &blackboard = tree.GetBlackboard();
 
+    // attack enemy sequence
+    auto attackEnemySequence = std::make_shared<bt::Sequence>();
+    auto targetNearestEnemyNode = std::make_shared<TargetNearestEnemyNode>(blackboard);
+    auto moveToEnemyNode = std::make_shared<MoveToEnemyNode>(blackboard);
+    auto attackEnemyNode = std::make_shared<AttackEnemyNode>(blackboard);
+    attackEnemySequence->AddChild(targetNearestEnemyNode);
+    attackEnemySequence->AddChild(moveToEnemyNode);
+    attackEnemySequence->AddChild(attackEnemyNode);
+
+    // idle sequence
     auto idleSequence = std::make_shared<bt::Sequence>();
     auto setRandomTargetNode = std::make_shared<SetRandomTargetNode>(blackboard);
     auto moveNode = std::make_shared<MoveNode>(blackboard);

@@ -75,7 +75,6 @@ tree.SetRoot(selector);
 ```c++
 // inside game loop
 tree.Update();
-}
 ```
 
 ##### 4. what else?

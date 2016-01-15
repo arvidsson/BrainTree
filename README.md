@@ -80,4 +80,4 @@ tree.Update();
 ##### 4. what else?
 
 * Code is fairly well documented. Read up on what the different composites and decorators do!
-* Access a global, singleton blackboard using Blackboard::GetInstance()
+* Access a global blackboard using Blackboard::GetInstance() for sharing state between trees.

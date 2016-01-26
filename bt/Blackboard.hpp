@@ -29,7 +29,7 @@ public:
     bool HasFloat(std::string key) const;
 
     void SetDouble(std::string key, double value);
-    float GetDouble(std::string key);
+    double GetDouble(std::string key);
     bool HasDouble(std::string key) const;
 
     void SetString(std::string key, std::string value);

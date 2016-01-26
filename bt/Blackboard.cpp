@@ -62,7 +62,7 @@ void Blackboard::SetDouble(std::string key, double value)
     doubles[key] = value;
 }
 
-float Blackboard::GetDouble(std::string key)
+double Blackboard::GetDouble(std::string key)
 {
     if (doubles.find(key) == doubles.end()) {
         doubles[key] = 0.0f;

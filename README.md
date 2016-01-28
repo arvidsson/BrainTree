@@ -3,18 +3,25 @@ bt
 
 A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php) implementation.
 
-the basics
-----------
+Features
+--------
 
-##### 0. include bt
+* behavior tree
+* predefined composites
+* predefined decorators
+* rudimentary blackboard
+
+Install
+-------
+
+Include ```bt.hpp``` and ```bt``` folder in your project.
+
+Example
+-------
 
 ```c++
 #include <bt.hpp>
-```
 
-##### 1. define leafs
-
-```c++
 class WaitNode : public bt::Leaf
 {
 public:
@@ -40,44 +47,40 @@ private:
     int limit;
     int counter;
 };
+
+int main()
+{
+    bt::BehaviorTree tree;
+
+    // each tree has one blackboard each, which the leafs can use
+    auto &blackboard = tree.GetBlackBoard();
+
+    // create a sequence
+    auto attackEnemySequence = std::make_shared<bt::Sequence>();
+    auto targetNearestEnemyNode = std::make_shared<TargetNearestEnemyNode>(blackboard);
+    auto moveToEnemyNode = std::make_shared<MoveToEnemyNode>(blackboard);
+    auto attackEnemyNode = std::make_shared<AttackEnemyNode>(blackboard);
+    attackEnemySequence->AddChild(targetNearestEnemyNode);
+    attackEnemySequence->AddChild(moveToEnemyNode);
+    attackEnemySequence->AddChild(attackEnemyNode);
+
+    // ...
+
+    // create a selector
+    auto selector = std::make_shared<bt::Selector>();
+    selector->AddChild(attackEnemySequence);
+    selector->AddChild(idleSequence);
+
+    // set the root of the tree
+    tree.SetRoot(selector);
+
+    // inside game loop
+    tree.Update();
+
+    return 0;
+}
 ```
 
-##### 2. construct the behavior tree
-
-```c++
-bt::BehaviorTree tree;
-
-// each tree has one blackboard each, which the leafs can use
-auto &blackboard = tree.GetBlackBoard();
-
-// create a sequence
-auto attackEnemySequence = std::make_shared<bt::Sequence>();
-auto targetNearestEnemyNode = std::make_shared<TargetNearestEnemyNode>(blackboard);
-auto moveToEnemyNode = std::make_shared<MoveToEnemyNode>(blackboard);
-auto attackEnemyNode = std::make_shared<AttackEnemyNode>(blackboard);
-attackEnemySequence->AddChild(targetNearestEnemyNode);
-attackEnemySequence->AddChild(moveToEnemyNode);
-attackEnemySequence->AddChild(attackEnemyNode);
-
-...
-
-// create a selector
-auto selector = std::make_shared<bt::Selector>();
-selector->AddChild(attackEnemySequence);
-selector->AddChild(idleSequence);
-
-// set the root of the tree
-tree.SetRoot(selector);
-```
-
-##### 3. update the tree
-
-```c++
-// inside game loop
-tree.Update();
-```
-
-##### 4. what else?
-
-* Code is fairly well documented. Read up on what the different composites and decorators do!
-* Access a global blackboard using Blackboard::GetInstance() for sharing state between trees.
+License
+-------
+MIT (c) arvidsson

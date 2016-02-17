@@ -54,6 +54,8 @@ public:
 
         return Status::Running;
     }
+    
+    using Ptr = std::shared_ptr<ParallelSequence>;
 
 private:
     bool useSuccessFailPolicy = false;
@@ -62,5 +64,10 @@ private:
     int minSuccess = 0;
     int minFail = 0;
 };
+
+ParallelSequence::Ptr MakeParallelSequence()
+{
+    return std::make_shared<ParallelSequence>();
+}
 
 }

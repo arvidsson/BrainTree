@@ -37,6 +37,13 @@ public:
             }
         }
     }
+    
+    using Ptr = std::shared_ptr<MemSequence>;
 };
+
+MemSequence::Ptr MakeMemSequence()
+{
+    return std::make_shared<MemSequence>();
+}
 
 }

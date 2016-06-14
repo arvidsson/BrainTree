@@ -24,7 +24,7 @@ public:
             auto s = child->Tick();
 
             if (s == Status::Running) {
-                break;
+                return Status::Running;
             }
 
             if (s == Status::Failure) {

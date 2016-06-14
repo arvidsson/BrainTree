@@ -41,7 +41,7 @@ public:
     using Ptr = std::shared_ptr<MemSelector>;
 };
 
-MemSelector::Ptr MakeMemSelector()
+static MemSelector::Ptr MakeMemSelector()
 {
     return std::make_shared<MemSelector>();
 }

@@ -45,7 +45,7 @@ public:
     using Ptr = std::shared_ptr<Sequence>;
 };
 
-Sequence::Ptr MakeSequence()
+static Sequence::Ptr MakeSequence()
 {
     return std::make_shared<Sequence>();
 }

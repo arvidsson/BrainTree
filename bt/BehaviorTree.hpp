@@ -10,8 +10,8 @@ class BehaviorTree : public Node
 {
 public:
     BehaviorTree() : blackboard(std::make_shared<Blackboard>()) {}
-    BehaviorTree(const Node::Ptr &rootNode) : BehaviorTree(), root(rootNode) {}
-    BehaviorTree(const Blackboard::Ptr &shared) : BehaviorTree(), sharedBlackboard(shared) {}
+    BehaviorTree(const Node::Ptr &rootNode) : BehaviorTree() { root = rootNode; }
+    BehaviorTree(const Blackboard::Ptr &shared) : BehaviorTree() { sharedBlackboard = shared; }
     
     Status Update() { return root->Tick(); }
     

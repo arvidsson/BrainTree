@@ -65,7 +65,7 @@ private:
     int minFail = 0;
 };
 
-ParallelSequence::Ptr MakeParallelSequence()
+static ParallelSequence::Ptr MakeParallelSequence()
 {
     return std::make_shared<ParallelSequence>();
 }

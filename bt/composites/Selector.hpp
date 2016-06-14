@@ -45,7 +45,7 @@ public:
     using Ptr = std::shared_ptr<Selector>;
 };
 
-Selector::Ptr MakeSelector()
+static Selector::Ptr MakeSelector()
 {
     return std::make_shared<Selector>();
 }

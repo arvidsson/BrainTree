@@ -1,27 +1,25 @@
 #pragma once
 
-#include "../Decorator.hpp"
+#include "../Decorator.h"
 
-namespace bt
+namespace BrainTree
 {
 
-/*
-    The Repeater decorator repeats infinitely or to a limit until the child returns success.
-*/
+// The Repeater decorator repeats infinitely or to a limit until the child returns success.
 class Repeater : public Decorator
 {
 public:
     Repeater(int limit = 0) : limit(limit) {}
 
-    void Initialize() override
+    void initialize() override
     {
         counter = 0;
     }
 
-    Status Update() override
+    Status update() override
     {
         while (1) {
-            auto s = child->Tick();
+            auto s = child->tick();
 
             if (s == Status::Running) {
                 return Status::Running;
@@ -35,7 +33,7 @@ public:
                 return Status::Success;
             }
 
-            child->Reset();
+            child->reset();
         }
     }
 

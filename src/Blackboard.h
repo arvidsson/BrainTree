@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <memory>
 
-namespace bt
+namespace BrainTree
 {
 
 class Blackboard

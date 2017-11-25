@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Node.hpp"
-#include "Blackboard.hpp"
+#include "Node.h"
+#include "Blackboard.h"
 
-namespace bt
+namespace BrainTree
 {
 
 class BehaviorTree : public Node

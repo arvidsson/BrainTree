@@ -41,6 +41,8 @@ public:
     bool is_terminated() const { return is_success() || is_failure(); }
     void reset() { status = Status::Invalid; }
 
+    using Ptr = std::shared_ptr<Node>;
+
 protected:
     Status status = Status::Invalid;
 };

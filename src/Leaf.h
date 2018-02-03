@@ -11,12 +11,12 @@ class Leaf : public Node
 public:
     Leaf() {}
     virtual ~Leaf() {}
-    Leaf(Blackboard* blackboard) : blackboard(blackboard) {}
+    Leaf(Blackboard::Ptr blackboard) : blackboard(blackboard) {}
     
     virtual Status update() = 0;
 
 protected:
-    Blackboard* blackboard;
+    Blackboard::Ptr blackboard;
 };
 
 }

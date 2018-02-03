@@ -28,7 +28,7 @@ public:
     // note: using a blackboard is optional
     WaitNode(BrainTree::Blackboard::Ptr board, int limit) : Leaf(board), limit(limit) {}
 
-    void Initialize() override
+    void initialize() override
     {
         counter = 0;
     }

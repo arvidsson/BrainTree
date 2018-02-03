@@ -33,7 +33,7 @@ public:
         counter = 0;
     }
 
-    Status Update() override
+    Status update() override
     {
         counter++;
         if (counter >= limit) {
@@ -75,7 +75,7 @@ int main()
     tree.SetRoot(selector);
 
     // inside game loop
-    tree.Update();
+    tree.update();
 
     return 0;
 }

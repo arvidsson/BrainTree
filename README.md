@@ -53,7 +53,7 @@ int main()
     BrainTree::BehaviorTree tree;
 
     // each tree has one blackboard each, which the leafs can use
-    auto &blackboard = tree.GetBlackBoard();
+    auto &blackboard = tree.GetBlackboard();
 
     // create a sequence
     auto attackEnemySequence = std::make_shared<BrainTree::Sequence>();

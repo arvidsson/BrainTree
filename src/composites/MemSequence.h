@@ -2,8 +2,7 @@
 
 #include "../Composite.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The MemSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
 // If a child fails or runs, the sequence returns the same status.
@@ -14,7 +13,7 @@ class MemSequence : public Composite
 public:
     Status update() override
     {
-        if (!has_children()) {
+        if (!hasChildren()) {
             return Status::Success;
         }
 
@@ -37,4 +36,4 @@ public:
     }
 };
 
-}
+} // BrainTree

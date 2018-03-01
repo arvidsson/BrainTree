@@ -2,8 +2,7 @@
 
 #include "../Composite.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The Sequence composite ticks each child node in order.
 // If a child fails or runs, the sequence returns the same status.
@@ -19,7 +18,7 @@ public:
 
     Status update() override
     {
-        if (!has_children()) {
+        if (!hasChildren()) {
             return Status::Success;
         }
 
@@ -41,4 +40,4 @@ public:
     }
 };
 
-}
+} // BrainTree

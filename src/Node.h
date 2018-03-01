@@ -1,7 +1,8 @@
 #pragma once
 
-namespace BrainTree
-{
+#include <memory>
+
+namespace BrainTree {
 
 class Node
 {
@@ -35,10 +36,11 @@ public:
         return status;
     }
 
-    bool is_success() const { return status == Status::Success; }
-    bool is_failure() const { return status == Status::Failure; }
-    bool is_running() const { return status == Status::Running; }
-    bool is_terminated() const { return is_success() || is_failure(); }
+    bool isSuccess() const { return status == Status::Success; }
+    bool isFailure() const { return status == Status::Failure; }
+    bool isRunning() const { return status == Status::Running; }
+    bool isTerminated() const { return isSuccess() || isFailure(); }
+
     void reset() { status = Status::Invalid; }
 
     using Ptr = std::shared_ptr<Node>;
@@ -47,4 +49,4 @@ protected:
     Status status = Status::Invalid;
 };
 
-}
+} // BrainTree

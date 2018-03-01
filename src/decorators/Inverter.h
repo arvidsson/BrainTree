@@ -2,8 +2,7 @@
 
 #include "../Decorator.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The Inverter decorator inverts the child node's status, i.e. failure becomes success and success becomes failure.
 // If the child runs, the Inverter returns the status that it is running too.
@@ -25,4 +24,4 @@ public:
     }
 };
 
-}
+} // BrainTree

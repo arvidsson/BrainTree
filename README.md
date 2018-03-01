@@ -10,23 +10,25 @@ Features
 * predefined composites
 * predefined decorators
 * rudimentary blackboard
+* (in progress) behavior tree builders
 
 Install
 -------
 
-Include all files in src folder in your project.
+Include ```BehaviorTree.h``` in your project.
 
 Example
 -------
 
 ```c++
 #include <BrainTree.h>
+namespace bt = BrainTree;
 
-class WaitNode : public BrainTree::Leaf
+class WaitNode : public bt::Leaf
 {
 public:
     // note: using a blackboard is optional
-    WaitNode(BrainTree::Blackboard::Ptr board, int limit) : Leaf(board), limit(limit) {}
+    WaitNode(bt::Blackboard::Ptr board, int limit) : Leaf(board), limit(limit) {}
 
     void initialize() override
     {
@@ -50,29 +52,29 @@ private:
 
 int main()
 {
-    BrainTree::BehaviorTree tree;
+    bt::BehaviorTree tree;
 
     // each tree has one blackboard each, which the leafs can use
-    auto &blackboard = tree.GetBlackboard();
+    auto &blackboard = tree.getBlackboard();
 
     // create a sequence
-    auto attackEnemySequence = std::make_shared<BrainTree::Sequence>();
+    auto attackEnemySequence = std::make_shared<bt::Sequence>();
     auto targetNearestEnemyNode = std::make_shared<TargetNearestEnemyNode>(blackboard);
     auto moveToEnemyNode = std::make_shared<MoveToEnemyNode>(blackboard);
     auto attackEnemyNode = std::make_shared<AttackEnemyNode>(blackboard);
-    attackEnemySequence->AddChild(targetNearestEnemyNode);
-    attackEnemySequence->AddChild(moveToEnemyNode);
-    attackEnemySequence->AddChild(attackEnemyNode);
+    attackEnemySequence->addChild(targetNearestEnemyNode);
+    attackEnemySequence->addChild(moveToEnemyNode);
+    attackEnemySequence->addChild(attackEnemyNode);
 
     // ...
 
     // create a selector
-    auto selector = std::make_shared<BrainTree::Selector>();
-    selector->AddChild(attackEnemySequence);
-    selector->AddChild(idleSequence);
+    auto selector = std::make_shared<bt::Selector>();
+    selector->addChild(attackEnemySequence);
+    selector->addChild(idleSequence);
 
     // set the root of the tree
-    tree.SetRoot(selector);
+    tree.setRoot(selector);
 
     // inside game loop
     tree.update();

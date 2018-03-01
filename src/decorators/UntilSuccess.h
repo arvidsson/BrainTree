@@ -2,8 +2,7 @@
 
 #include "../Decorator.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The UntilSuccess decorator repeats until the child returns success and then returns success.
 class UntilSuccess : public Decorator
@@ -21,4 +20,4 @@ public:
     }
 };
 
-}
+} // BrainTree

@@ -3,8 +3,7 @@
 #include "Node.h"
 #include "Blackboard.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 class Leaf : public Node
 {
@@ -19,4 +18,4 @@ protected:
     Blackboard::Ptr blackboard;
 };
 
-}
+} // BrainTree

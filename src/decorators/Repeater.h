@@ -2,8 +2,7 @@
 
 #include "../Decorator.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The Repeater decorator repeats infinitely or to a limit until the child returns success.
 class Repeater : public Decorator
@@ -42,4 +41,4 @@ protected:
     int counter = 0;
 };
 
-}
+} // BrainTree

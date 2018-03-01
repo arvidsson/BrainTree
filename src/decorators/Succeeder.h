@@ -2,8 +2,7 @@
 
 #include "../Decorator.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The Succeeder decorator returns success, regardless of what happens to the child.
 class Succeeder : public Decorator
@@ -16,4 +15,4 @@ public:
     }
 };
 
-}
+} // BrainTree

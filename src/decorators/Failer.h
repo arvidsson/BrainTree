@@ -2,8 +2,7 @@
 
 #include "../Decorator.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 // The Failer decorator returns failure, regardless of what happens to the child.
 class Failer : public Decorator
@@ -16,4 +15,4 @@ public:
     }
 };
 
-}
+} // BrainTree

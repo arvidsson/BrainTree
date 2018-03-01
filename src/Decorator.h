@@ -2,19 +2,18 @@
 
 #include "Node.h"
 
-namespace BrainTree
-{
+namespace BrainTree {
 
 class Decorator : public Node
 {
 public:
     virtual ~Decorator() {}
 
-    void set_child(Node::Ptr node) { child = node; }
-    bool has_child() const { return child != nullptr; }
+    void setChild(Node::Ptr node) { child = node; }
+    bool hasChild() const { return child != nullptr; }
     
 protected:
     Node::Ptr child = nullptr;
 };
 
-}
+} // BrainTree

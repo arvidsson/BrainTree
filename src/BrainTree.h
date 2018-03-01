@@ -1,23 +1,26 @@
 #pragma once
 
-#include "BehaviorTree.hpp"
-#include "Blackboard.hpp"
-#include "Composite.hpp"
-#include "Decorator.hpp"
-#include "Leaf.hpp"
-#include "Node.hpp"
+#include "BehaviorTree.h"
+#include "Blackboard.h"
+#include "Composite.h"
+#include "Decorator.h"
+#include "Leaf.h"
+#include "Node.h"
 
-// CompositeS
-#include "Composites/MemSelector.hpp"
-#include "Composites/MemSequence.hpp"
-#include "Composites/ParallelSequence.hpp"
-#include "Composites/Selector.hpp"
-#include "Composites/Sequence.hpp"
+// Composites
+#include "composites/MemSelector.h"
+#include "composites/MemSequence.h"
+#include "composites/ParallelSequence.h"
+#include "composites/Selector.h"
+#include "composites/Sequence.h"
 
 // Decorators
-#include "Decorators/Failer.hpp"
-#include "Decorators/Inverter.hpp"
-#include "Decorators/Repeater.hpp"
-#include "Decorators/Succeeder.hpp"
-#include "Decorators/UntilFail.hpp"
-#include "Decorators/UntilSuccess.hpp"
+#include "decorators/Failer.h"
+#include "decorators/Inverter.h"
+#include "decorators/Repeater.h"
+#include "decorators/Succeeder.h"
+#include "decorators/UntilFail.h"
+#include "decorators/UntilSuccess.h"
+
+// Builders
+#include "builders/LeafBuilder.h"

@@ -13,7 +13,7 @@ public:
     BehaviorTree(const Node::Ptr &rootNode) : BehaviorTree() { root = rootNode; }
     BehaviorTree(const Blackboard::Ptr &shared) : BehaviorTree() { sharedBlackboard = shared; }
     
-    Status Update() { return root->Tick(); }
+    Status update() { return root->Tick(); }
     
     void SetRoot(const Node::Ptr &node) { root = node; }
     Blackboard::Ptr GetBlackboard() const { return blackboard; }

@@ -14,6 +14,6 @@ public:
 private:
     Parent* parent;
     Behavior* behavior;
-}
+};
 
 }

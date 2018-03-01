@@ -33,7 +33,7 @@ public:
         counter = 0;
     }
 
-    Status Update() override
+    Status update() override
     {
         counter++;
         if (counter >= limit) {
@@ -53,7 +53,7 @@ int main()
     BrainTree::BehaviorTree tree;
 
     // each tree has one blackboard each, which the leafs can use
-    auto &blackboard = tree.GetBlackBoard();
+    auto &blackboard = tree.GetBlackboard();
 
     // create a sequence
     auto attackEnemySequence = std::make_shared<BrainTree::Sequence>();
@@ -75,7 +75,7 @@ int main()
     tree.SetRoot(selector);
 
     // inside game loop
-    tree.Update();
+    tree.update();
 
     return 0;
 }

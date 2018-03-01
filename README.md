@@ -15,7 +15,7 @@ Features
 Install
 -------
 
-Include ```BehaviorTree.h``` in your project.
+Include ```BrainTree.h``` in your project.
 
 Example
 -------

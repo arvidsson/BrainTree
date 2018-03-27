@@ -3,24 +3,24 @@
 header_files = [
     # Core
     "Node.h",
+	"Composite.h",
+    "Decorator.h",
     "Blackboard.h",
     "Leaf.h",
-    "Composite.h",
-    "Decorator.h",
     "BehaviorTree.h",
     # Composites
-    "Composites/MemSelector.h",
-    "Composites/MemSequence.h",
-    "Composites/ParallelSequence.h",
     "Composites/Selector.h",
     "Composites/Sequence.h",
+	"Composites/StatefulSelector.h",
+    "Composites/StatefulSequence.h",
+	"Composites/ParallelSequence.h",
     # Decorators
+	"Decorators/Succeeder.h",
     "Decorators/Failer.h",
     "Decorators/Inverter.h",
     "Decorators/Repeater.h",
-    "Decorators/Succeeder.h",
-    "Decorators/UntilFail.h",
-    "Decorators/UntilSuccess.h",
+	"Decorators/UntilSuccess.h",
+    "Decorators/UntilFailure.h",
 	# Builders
 	"Builders/CompositeBuilder.h",
 	"Builders/DecoratorBuilder.h",

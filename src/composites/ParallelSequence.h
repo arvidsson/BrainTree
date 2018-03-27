@@ -1,8 +1,10 @@
 #pragma once
 
 #include "../Composite.h"
+#include <cassert>
 
-namespace BrainTree {
+namespace BrainTree
+{
 
 class ParallelSequence : public Composite
 {
@@ -12,6 +14,8 @@ public:
 
     Status update() override
     {
+        assert(hasChildren() && "Composite has no children");
+
         int minimumSuccess = minSuccess;
         int minimumFail = minFail;
 
@@ -62,4 +66,4 @@ private:
     int minFail = 0;
 };
 
-} // BrainTree
+}

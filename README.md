@@ -74,6 +74,37 @@ int main()
 }
 ```
 
+Composites
+----------
+
+### Selector
+
+* The Selector composite ticks each child node in order.
+* If a child succeeds or runs, the selector returns the same status.
+* In the next tick, it will try to run each child in order again.
+* If all children fails, only then does the selector fail.
+
+### Sequence
+
+* The Sequence composite ticks each child node in order.
+* If a child fails or runs, the sequence returns the same status.
+* In the next tick, it will try to run each child in order again.
+* If all children succeeds, only then does the sequence succeed.
+
+### StatefulSelector
+
+* The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
+* If a child succeeds or runs, the stateful selector returns the same status.
+* In the next tick, it will try to run the next child or start from the beginning again.
+* If all children fails, only then does the stateful selector fail.
+
+### StatefulSequence
+
+* The StatefulSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
+* If a child fails or runs, the stateful sequence returns the same status.
+* In the next tick, it will try to run the next child or start from the beginning again.
+* If all children succeeds, only then does the stateful sequence succeed.
+
 License
 -------
 MIT (c) arvidsson

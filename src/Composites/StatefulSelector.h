@@ -6,18 +6,13 @@
 namespace BrainTree
 {
 
-// The Selector composite ticks each child node in order.
-// If a child succeeds or runs, the selector returns the same status.
-// In the next tick, it will try to run each child in order again.
-// If all children fails, only then does the selector fail.
-class Selector : public Composite
+// The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
+// If a child succeeds or runs, the stateful selector returns the same status.
+// In the next tick, it will try to run the next child or start from the beginning again.
+// If all children fails, only then does the stateful selector fail.
+class StatefulSelector : public Composite
 {
 public:
-    void initialize() override
-    {
-        it = children.begin();
-    }
-
     Status update() override
     {
         assert(hasChildren() && "Composite has no children");
@@ -32,6 +27,7 @@ public:
             it++;
         }
 
+        it = children.begin();
         return Status::Failure;
     }
 };

@@ -40,21 +40,21 @@ public:
 
 void CreatingBehaviorTreeManually()
 {
-	BrainTree::BehaviorTree tree;
-	auto sequence = std::make_shared<BrainTree::Sequence>();
+    BrainTree::BehaviorTree tree;
+    auto sequence = std::make_shared<BrainTree::Sequence>();
     auto actionOne = std::make_shared<Action>();
-	auto actionTwo = std::make_shared<Action>();
-	auto actionThree = std::make_shared<Action>();
-	sequence.addChild(actionOne);
-	sequence.addChild(actionTwo);
-	sequence.addChild(actionThree);
+    auto actionTwo = std::make_shared<Action>();
+    auto actionThree = std::make_shared<Action>();
+    sequence.addChild(actionOne);
+    sequence.addChild(actionTwo);
+    sequence.addChild(actionThree);
     tree.setRoot(sequence);
     tree.update();
 }
 
 void CreatingBehaviorTreeUsingBuilders()
 {
-	auto tree = BrainTree::TreeBuilder()
+    auto tree = BrainTree::TreeBuilder()
         .composite<BrainTree::Sequence>()
             .leaf<Action>()
             .leaf<Action>()
@@ -68,7 +68,7 @@ int main()
 {
     CreatingBehaviorTreeManually();
 
-	CreatingBehaviorTreeUsingBuilders();
+    CreatingBehaviorTreeUsingBuilders();
 
     return 0;
 }

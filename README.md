@@ -9,8 +9,8 @@ Features
 * behavior tree
 * predefined composites
 * predefined decorators
-* rudimentary blackboard
-* (in progress) behavior tree builders
+* (optional) rudimentary blackboard
+* (optional) behavior tree builders
 
 Install
 -------
@@ -21,63 +21,54 @@ Example
 -------
 
 ```c++
+// this example should print out "Hello, World!", six times
+#include <iostream>
 #include <BrainTree.h>
-namespace bt = BrainTree;
 
-class WaitNode : public bt::Leaf
+class Action : public BrainTree::Node
 {
 public:
-    // note: using a blackboard is optional
-    WaitNode(bt::Blackboard::Ptr board, int limit) : Leaf(board), limit(limit) {}
-
-    void initialize() override
-    {
-        counter = 0;
-    }
+    Action() {}
 
     Status update() override
     {
-        counter++;
-        if (counter >= limit) {
-            return Node::Status::Success;
-        }
+        std::cout << "Hello, World!" << std::endl;
 
-        return Node::Status::Running;
+        return Node::Status::Success;
     }
-
-private:
-    int limit;
-    int counter;
 };
+
+void CreatingBehaviorTreeManually()
+{
+	BrainTree::BehaviorTree tree;
+	auto sequence = std::make_shared<BrainTree::Sequence>();
+    auto actionOne = std::make_shared<Action>();
+	auto actionTwo = std::make_shared<Action>();
+	auto actionThree = std::make_shared<Action>();
+	sequence.addChild(actionOne);
+	sequence.addChild(actionTwo);
+	sequence.addChild(actionThree);
+    tree.setRoot(sequence);
+    tree.update();
+}
+
+void CreatingBehaviorTreeUsingBuilders()
+{
+	auto tree = BrainTree::TreeBuilder()
+        .composite<BrainTree::Sequence>()
+            .leaf<Action>()
+            .leaf<Action>()
+            .leaf<Action>()
+        .end()
+        .build();
+    tree->update();
+}
 
 int main()
 {
-    bt::BehaviorTree tree;
+    CreatingBehaviorTreeManually();
 
-    // each tree has one blackboard each, which the leafs can use
-    auto &blackboard = tree.getBlackboard();
-
-    // create a sequence
-    auto attackEnemySequence = std::make_shared<bt::Sequence>();
-    auto targetNearestEnemyNode = std::make_shared<TargetNearestEnemyNode>(blackboard);
-    auto moveToEnemyNode = std::make_shared<MoveToEnemyNode>(blackboard);
-    auto attackEnemyNode = std::make_shared<AttackEnemyNode>(blackboard);
-    attackEnemySequence->addChild(targetNearestEnemyNode);
-    attackEnemySequence->addChild(moveToEnemyNode);
-    attackEnemySequence->addChild(attackEnemyNode);
-
-    // ...
-
-    // create a selector
-    auto selector = std::make_shared<bt::Selector>();
-    selector->addChild(attackEnemySequence);
-    selector->addChild(idleSequence);
-
-    // set the root of the tree
-    tree.setRoot(selector);
-
-    // inside game loop
-    tree.update();
+	CreatingBehaviorTreeUsingBuilders();
 
     return 0;
 }

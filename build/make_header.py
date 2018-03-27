@@ -20,20 +20,30 @@ header_files = [
     "Decorators/Repeater.h",
     "Decorators/Succeeder.h",
     "Decorators/UntilFail.h",
-    "Decorators/UntilSuccess.h"
+    "Decorators/UntilSuccess.h",
+	# Builders
+	"Builders/CompositeBuilder.h",
+	"Builders/DecoratorBuilder.h",
+	"Builders/TreeBuilder.h"
 ]
 
 def process_file(path):
     lines = []
     start = 0
+    end = 1
     with open(path, "r") as infile:
         for line in infile:
-            if '} // BrainTree' in line.rstrip():
-                start = 0
-            elif start:
+            if start:
                 lines.append(line)
-            elif 'namespace BrainTree {' in line.rstrip():
+            elif '{' in line.rstrip():
                 start = 1
+		for line in reversed(lines):
+			if end:
+				lines.pop()
+            elif '}' in line.rstrip():
+				lines.pop()
+				end = 0
+	lines.pop()
     return lines
 
 def process_files(files):

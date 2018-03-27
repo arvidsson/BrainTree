@@ -12,6 +12,7 @@
 namespace BrainTree
 {
 
+
 class Node
 {
 public:
@@ -169,19 +170,15 @@ class BehaviorTree : public Node
 public:
     BehaviorTree() : blackboard(std::make_shared<Blackboard>()) {}
     BehaviorTree(const Node::Ptr &rootNode) : BehaviorTree() { root = rootNode; }
-    BehaviorTree(const Blackboard::Ptr &shared) : BehaviorTree() { sharedBlackboard = shared; }
     
     Status update() { return root->tick(); }
     
     void setRoot(const Node::Ptr &node) { root = node; }
     Blackboard::Ptr getBlackboard() const { return blackboard; }
-    Blackboard::Ptr getSharedBlackboard() const { return sharedBlackboard; }
-    void setSharedBlackboard(const Blackboard::Ptr &shared) { sharedBlackboard = shared; }
     
 private:
     Node::Ptr root = nullptr;
     Blackboard::Ptr blackboard = nullptr;
-    Blackboard::Ptr sharedBlackboard = nullptr;
 };
 
 
@@ -499,5 +496,127 @@ public:
         }
     }
 };
+
+
+template <class Parent>
+class DecoratorBuilder;
+
+template <class Parent>
+class CompositeBuilder
+{
+public:
+    CompositeBuilder(Parent* parent, Composite* node) : parent(parent), node(node) {}
+
+    template <class NodeType, typename... Args>
+    CompositeBuilder<Parent> leaf(Args... args)
+    {
+        auto child = std::make_shared<NodeType>((args)...);
+        node->addChild(child);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<CompositeBuilder<Parent>> composite(Args... args)
+    {
+        auto child = std::make_shared<CompositeType>((args)...);
+        node->addChild(child);
+        return CompositeBuilder<CompositeBuilder<Parent>>(this, (CompositeType*)child.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<CompositeBuilder<Parent>> decorator(Args... args)
+    {
+        auto child = std::make_shared<DecoratorType>((args)...);
+        node->addChild(child);
+        return DecoratorBuilder<CompositeBuilder<Parent>>(this, (DecoratorType*)child.get());
+    }
+
+    Parent& end()
+    {
+        return *parent;
+    }
+
+private:
+    Parent* parent;
+    Composite* node;
+};
+
+
+template <class Parent>
+class DecoratorBuilder
+{
+public:
+    DecoratorBuilder(Parent* parent, Decorator* node) : parent(parent), node(node) {}
+
+    template <class NodeType, typename... Args>
+    DecoratorBuilder<Parent> leaf(Args... args)
+    {
+        auto child = std::make_shared<NodeType>((args)...);
+        node->setChild(child);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<DecoratorBuilder<Parent>> composite(Args... args)
+    {
+        auto child = std::make_shared<CompositeType>((args)...);
+        node->setChild(child);
+        return CompositeBuilder<DecoratorBuilder<Parent>>(this, (CompositeType*)child.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<DecoratorBuilder<Parent>> decorator(Args... args)
+    {
+        auto child = std::make_shared<DecoratorType>((args)...);
+        node->setChild(child);
+        return DecoratorBuilder<DecoratorBuilder<Parent>>(this, (DecoratorType*)child.get());
+    }
+
+    Parent& end()
+    {
+        return *parent;
+    }
+
+private:
+    Parent* parent;
+    Decorator* node;
+};
+
+
+class TreeBuilder
+{
+public:
+    template <class NodeType, typename... Args>
+    TreeBuilder leaf(Args... args)
+    {
+        root = std::make_shared<NodeType>((args)...);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<TreeBuilder> composite(Args... args)
+    {
+        root = std::make_shared<CompositeType>((args)...);
+        return CompositeBuilder<TreeBuilder>(this, (CompositeType*)root.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<TreeBuilder> decorator(Args... args)
+    {
+        root = std::make_shared<DecoratorType>((args)...);
+        return DecoratorBuilder<TreeBuilder>(this, (DecoratorType*)root.get());
+    }
+
+    Node::Ptr build()
+    {
+        auto tree = std::make_shared<BehaviorTree>();
+        tree->setRoot(root);
+        return tree;
+    }
+
+private:
+    Node::Ptr root;
+};
+
 
 } // namespace BrainTree

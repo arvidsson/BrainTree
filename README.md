@@ -105,6 +105,22 @@ Composites
 * In the next tick, it will try to run the next child or start from the beginning again.
 * If all children succeeds, only then does the stateful sequence succeed.
 
+Builder
+-------
+
+The Builder class makes it easier to create a behavior tree. You use three methods to build your tree: `leaf<NodeType>()`, `composite<CompositeType>()` and `decorator<DecoratorType>()`. Both `composite()` and `decorator()` require a corresponding call to `end()`, this marks where you are done adding children to a composite or a child to a decorator. At the end you call `build()` which will then give you the finished behavior tree.
+
+```
+auto tree = Builder()
+    .decorator<Repeater>()
+        .composite<Sequence>()
+            .leaf<SayHello>("Foo")
+            .leaf<SayHello>("Bar")
+        .end()
+    .end()
+    .build();
+```
+
 License
 -------
 MIT (c) arvidsson

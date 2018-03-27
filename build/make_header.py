@@ -8,6 +8,7 @@ header_files = [
     "Blackboard.h",
     "Leaf.h",
     "BehaviorTree.h",
+	"Builder.h",
     # Composites
     "Composites/Selector.h",
     "Composites/Sequence.h",
@@ -20,11 +21,7 @@ header_files = [
     "Decorators/Inverter.h",
     "Decorators/Repeater.h",
 	"Decorators/UntilSuccess.h",
-    "Decorators/UntilFailure.h",
-	# Builders
-	"Builders/CompositeBuilder.h",
-	"Builders/DecoratorBuilder.h",
-	"Builders/TreeBuilder.h"
+    "Decorators/UntilFailure.h"
 ]
 
 def process_file(path):

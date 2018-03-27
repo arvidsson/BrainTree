@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <cassert>
 
 namespace BrainTree
 {
@@ -56,6 +57,34 @@ public:
 
 protected:
     Status status = Status::Invalid;
+};
+
+
+class Composite : public Node
+{
+public:
+    Composite() : it(children.begin()) {}
+    virtual ~Composite() {}
+    
+    void addChild(Node::Ptr child) { children.push_back(child); }
+    bool hasChildren() const { return !children.empty(); }
+    
+protected:
+    std::vector<Node::Ptr> children;
+    std::vector<Node::Ptr>::iterator it;
+};
+
+
+class Decorator : public Node
+{
+public:
+    virtual ~Decorator() {}
+
+    void setChild(Node::Ptr node) { child = node; }
+    bool hasChild() const { return child != nullptr; }
+    
+protected:
+    Node::Ptr child = nullptr;
 };
 
 
@@ -137,34 +166,6 @@ protected:
 };
 
 
-class Composite : public Node
-{
-public:
-    virtual ~Composite() {}
-    
-    void addChild(Node::Ptr child) { children.push_back(child); }
-    bool hasChildren() const { return !children.empty(); }
-    //int getIndex() const { return index; }
-    
-protected:
-    std::vector<Node::Ptr> children;
-    int index = 0;
-};
-
-
-class Decorator : public Node
-{
-public:
-    virtual ~Decorator() {}
-
-    void setChild(Node::Ptr node) { child = node; }
-    bool hasChild() const { return child != nullptr; }
-    
-protected:
-    Node::Ptr child = nullptr;
-};
-
-
 class BehaviorTree : public Node
 {
 public:
@@ -182,68 +183,238 @@ private:
 };
 
 
-// The Selector composite ticks each child node in order, and remembers what child it prevously tried to tick.
-// If a child succeeds or runs, the sequence returns the same status.
-// In the next tick, it will try to run each child in order again.
-// If all children fails, only then does the selector fail.
-class MemSelector : public Composite
+template <class Parent>
+class DecoratorBuilder;
+
+template <class Parent>
+class CompositeBuilder
 {
 public:
+    CompositeBuilder(Parent* parent, Composite* node) : parent(parent), node(node) {}
+
+    template <class NodeType, typename... Args>
+    CompositeBuilder<Parent> leaf(Args... args)
+    {
+        auto child = std::make_shared<NodeType>((args)...);
+        node->addChild(child);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<CompositeBuilder<Parent>> composite(Args... args)
+    {
+        auto child = std::make_shared<CompositeType>((args)...);
+        node->addChild(child);
+        return CompositeBuilder<CompositeBuilder<Parent>>(this, (CompositeType*)child.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<CompositeBuilder<Parent>> decorator(Args... args)
+    {
+        auto child = std::make_shared<DecoratorType>((args)...);
+        node->addChild(child);
+        return DecoratorBuilder<CompositeBuilder<Parent>>(this, (DecoratorType*)child.get());
+    }
+
+    Parent& end()
+    {
+        return *parent;
+    }
+
+private:
+    Parent * parent;
+    Composite* node;
+};
+
+template <class Parent>
+class DecoratorBuilder
+{
+public:
+    DecoratorBuilder(Parent* parent, Decorator* node) : parent(parent), node(node) {}
+
+    template <class NodeType, typename... Args>
+    DecoratorBuilder<Parent> leaf(Args... args)
+    {
+        auto child = std::make_shared<NodeType>((args)...);
+        node->setChild(child);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<DecoratorBuilder<Parent>> composite(Args... args)
+    {
+        auto child = std::make_shared<CompositeType>((args)...);
+        node->setChild(child);
+        return CompositeBuilder<DecoratorBuilder<Parent>>(this, (CompositeType*)child.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<DecoratorBuilder<Parent>> decorator(Args... args)
+    {
+        auto child = std::make_shared<DecoratorType>((args)...);
+        node->setChild(child);
+        return DecoratorBuilder<DecoratorBuilder<Parent>>(this, (DecoratorType*)child.get());
+    }
+
+    Parent& end()
+    {
+        return *parent;
+    }
+
+private:
+    Parent * parent;
+    Decorator* node;
+};
+
+class Builder
+{
+public:
+    template <class NodeType, typename... Args>
+    Builder leaf(Args... args)
+    {
+        root = std::make_shared<NodeType>((args)...);
+        return *this;
+    }
+
+    template <class CompositeType, typename... Args>
+    CompositeBuilder<Builder> composite(Args... args)
+    {
+        root = std::make_shared<CompositeType>((args)...);
+        return CompositeBuilder<Builder>(this, (CompositeType*)root.get());
+    }
+
+    template <class DecoratorType, typename... Args>
+    DecoratorBuilder<Builder> decorator(Args... args)
+    {
+        root = std::make_shared<DecoratorType>((args)...);
+        return DecoratorBuilder<Builder>(this, (DecoratorType*)root.get());
+    }
+
+    Node::Ptr build()
+    {
+        assert(root != nullptr && "The Behavior Tree is empty!");
+        auto tree = std::make_shared<BehaviorTree>();
+        tree->setRoot(root);
+        return tree;
+    }
+
+private:
+    Node::Ptr root;
+};
+
+
+// The Selector composite ticks each child node in order.
+// If a child succeeds or runs, the selector returns the same status.
+// In the next tick, it will try to run each child in order again.
+// If all children fails, only then does the selector fail.
+class Selector : public Composite
+{
+public:
+    void initialize() override
+    {
+        it = children.begin();
+    }
+
     Status update() override
     {
-        if (!hasChildren()) {
-            return Status::Success;
-        }
+        assert(hasChildren() && "Composite has no children");
 
-        // Keep going until a child behavior says it's running.
-        while (1) {
-            auto &child = children.at(index);
-            auto status = child->tick();
+        while (it != children.end()) {
+            auto status = (*it)->tick();
 
-            // If the child succeeds, or keeps running, do the same.
             if (status != Status::Failure) {
                 return status;
             }
 
-            // Hit the end of the array, it didn't end well...
-            if (++index == children.size()) {
-                index = 0;
-                return Status::Failure;
-            }
+            it++;
         }
+
+        return Status::Failure;
     }
 };
 
 
-// The MemSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
+// The Sequence composite ticks each child node in order.
 // If a child fails or runs, the sequence returns the same status.
 // In the next tick, it will try to run each child in order again.
 // If all children succeeds, only then does the sequence succeed.
+class Sequence : public Composite
+{
+public:
+    void initialize() override
+    {
+        it = children.begin();
+    }
+
+    Status update() override
+    {
+        assert(hasChildren() && "Composite has no children");
+
+        while (it != children.end()) {
+            auto status = (*it)->tick();
+
+            if (status != Status::Success) {
+                return status;
+            }
+
+            it++;
+        }
+
+        return Status::Success;
+    }
+};
+
+
+// The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
+// If a child succeeds or runs, the stateful selector returns the same status.
+// In the next tick, it will try to run the next child or start from the beginning again.
+// If all children fails, only then does the stateful selector fail.
+class StatefulSelector : public Composite
+{
+public:
+    Status update() override
+    {
+        assert(hasChildren() && "Composite has no children");
+
+        while (it != children.end()) {
+            auto status = (*it)->tick();
+
+            if (status != Status::Failure) {
+                return status;
+            }
+
+            it++;
+        }
+
+        it = children.begin();
+        return Status::Failure;
+    }
+};
+
+
+// The StatefulSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
+// If a child fails or runs, the stateful sequence returns the same status.
+// In the next tick, it will try to run the next child or start from the beginning again.
+// If all children succeeds, only then does the stateful sequence succeed.
 class MemSequence : public Composite
 {
 public:
     Status update() override
     {
-        if (!hasChildren()) {
-            return Status::Success;
-        }
+        assert(hasChildren() && "Composite has no children");
 
-        // Keep going until a child behavior says it's running.
-        while (1) {
-            auto &child = children.at(index);
-            auto status = child->tick();
+        while (it != children.end()) {
+            auto status = (*it)->tick();
 
-            // If the child fails, or keeps running, do the same.
             if (status != Status::Success) {
                 return status;
             }
 
-            // Hit the end of the array, job done!
-            if (++index == children.size()) {
-                index = 0;
-                return Status::Success;
-            }
+            it++;
         }
+
+        it = children.begin();
+        return Status::Success;
     }
 };
 
@@ -256,6 +427,8 @@ public:
 
     Status update() override
     {
+        assert(hasChildren() && "Composite has no children");
+
         int minimumSuccess = minSuccess;
         int minimumFail = minFail;
 
@@ -307,76 +480,14 @@ private:
 };
 
 
-// The Selector composite ticks each child node in order.
-// If a child succeeds or runs, the selector returns the same status.
-// In the next tick, it will try to run each child in order again.
-// If all children fails, only then does the selector fail.
-class Selector : public Composite
+// The Succeeder decorator returns success, regardless of what happens to the child.
+class Succeeder : public Decorator
 {
 public:
-    void initialize() override
-    {
-        index = 0;
-    }
-
     Status update() override
     {
-        if (!hasChildren()) {
-            return Status::Success;
-        }
-
-        // Keep going until a child behavior says it's running.
-        while (1) {
-            auto &child = children.at(index);
-            auto status = child->tick();
-
-            // If the child succeeds, or keeps running, do the same.
-            if (status != Status::Failure) {
-                return status;
-            }
-
-            // Hit the end of the array, it didn't end well...
-            if (++index == children.size()) {
-                return Status::Failure;
-            }
-        }
-    }
-};
-
-
-// The Sequence composite ticks each child node in order.
-// If a child fails or runs, the sequence returns the same status.
-// In the next tick, it will try to run each child in order again.
-// If all children succeeds, only then does the sequence succeed.
-class Sequence : public Composite
-{
-public:
-    void initialize() override
-    {
-        index = 0;
-    }
-
-    Status update() override
-    {
-        if (!hasChildren()) {
-            return Status::Success;
-        }
-
-        // Keep going until a child behavior says it's running.
-        while (1) {
-            auto &child = children.at(index);
-            auto status = child->tick();
-            
-            // If the child fails, or keeps running, do the same.
-            if (status != Status::Success) {
-                return status;
-            }
-
-            // Hit the end of the array, job done!
-            if (++index == children.size()) {
-                return Status::Success;
-            }
-        }
+        child->tick();
+        return Status::Success;
     }
 };
 
@@ -452,35 +563,6 @@ protected:
 };
 
 
-// The Succeeder decorator returns success, regardless of what happens to the child.
-class Succeeder : public Decorator
-{
-public:
-    Status update() override
-    {
-        child->tick();
-        return Status::Success;
-    }
-};
-
-
-// The UntilFail decorator repeats until the child returns fail and then returns success.
-class UntilFail : public Decorator
-{
-public:
-    Status update() override
-    {
-        while (1) {
-            auto status = child->tick();
-
-            if (status == Status::Failure) {
-                return Status::Success;
-            }
-        }
-    }
-};
-
-
 // The UntilSuccess decorator repeats until the child returns success and then returns success.
 class UntilSuccess : public Decorator
 {
@@ -498,124 +580,20 @@ public:
 };
 
 
-template <class Parent>
-class DecoratorBuilder;
-
-template <class Parent>
-class CompositeBuilder
+// The UntilFailure decorator repeats until the child returns fail and then returns success.
+class UntilFailure : public Decorator
 {
 public:
-    CompositeBuilder(Parent* parent, Composite* node) : parent(parent), node(node) {}
-
-    template <class NodeType, typename... Args>
-    CompositeBuilder<Parent> leaf(Args... args)
+    Status update() override
     {
-        auto child = std::make_shared<NodeType>((args)...);
-        node->addChild(child);
-        return *this;
+        while (1) {
+            auto status = child->tick();
+
+            if (status == Status::Failure) {
+                return Status::Success;
+            }
+        }
     }
-
-    template <class CompositeType, typename... Args>
-    CompositeBuilder<CompositeBuilder<Parent>> composite(Args... args)
-    {
-        auto child = std::make_shared<CompositeType>((args)...);
-        node->addChild(child);
-        return CompositeBuilder<CompositeBuilder<Parent>>(this, (CompositeType*)child.get());
-    }
-
-    template <class DecoratorType, typename... Args>
-    DecoratorBuilder<CompositeBuilder<Parent>> decorator(Args... args)
-    {
-        auto child = std::make_shared<DecoratorType>((args)...);
-        node->addChild(child);
-        return DecoratorBuilder<CompositeBuilder<Parent>>(this, (DecoratorType*)child.get());
-    }
-
-    Parent& end()
-    {
-        return *parent;
-    }
-
-private:
-    Parent* parent;
-    Composite* node;
-};
-
-
-template <class Parent>
-class DecoratorBuilder
-{
-public:
-    DecoratorBuilder(Parent* parent, Decorator* node) : parent(parent), node(node) {}
-
-    template <class NodeType, typename... Args>
-    DecoratorBuilder<Parent> leaf(Args... args)
-    {
-        auto child = std::make_shared<NodeType>((args)...);
-        node->setChild(child);
-        return *this;
-    }
-
-    template <class CompositeType, typename... Args>
-    CompositeBuilder<DecoratorBuilder<Parent>> composite(Args... args)
-    {
-        auto child = std::make_shared<CompositeType>((args)...);
-        node->setChild(child);
-        return CompositeBuilder<DecoratorBuilder<Parent>>(this, (CompositeType*)child.get());
-    }
-
-    template <class DecoratorType, typename... Args>
-    DecoratorBuilder<DecoratorBuilder<Parent>> decorator(Args... args)
-    {
-        auto child = std::make_shared<DecoratorType>((args)...);
-        node->setChild(child);
-        return DecoratorBuilder<DecoratorBuilder<Parent>>(this, (DecoratorType*)child.get());
-    }
-
-    Parent& end()
-    {
-        return *parent;
-    }
-
-private:
-    Parent* parent;
-    Decorator* node;
-};
-
-
-class TreeBuilder
-{
-public:
-    template <class NodeType, typename... Args>
-    TreeBuilder leaf(Args... args)
-    {
-        root = std::make_shared<NodeType>((args)...);
-        return *this;
-    }
-
-    template <class CompositeType, typename... Args>
-    CompositeBuilder<TreeBuilder> composite(Args... args)
-    {
-        root = std::make_shared<CompositeType>((args)...);
-        return CompositeBuilder<TreeBuilder>(this, (CompositeType*)root.get());
-    }
-
-    template <class DecoratorType, typename... Args>
-    DecoratorBuilder<TreeBuilder> decorator(Args... args)
-    {
-        root = std::make_shared<DecoratorType>((args)...);
-        return DecoratorBuilder<TreeBuilder>(this, (DecoratorType*)root.get());
-    }
-
-    Node::Ptr build()
-    {
-        auto tree = std::make_shared<BehaviorTree>();
-        tree->setRoot(root);
-        return tree;
-    }
-
-private:
-    Node::Ptr root;
 };
 
 

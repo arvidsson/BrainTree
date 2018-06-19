@@ -522,23 +522,13 @@ public:
 
     Status update() override
     {
-        while (1) {
-            auto s = child->tick();
+        child->tick();
 
-            if (s == Status::Running) {
-                return Status::Running;
-            }
-
-            if (s == Status::Failure) {
-                return Status::Failure;
-            }
-
-            if (limit > 0 && ++counter == limit) {
-                return Status::Success;
-            }
-
-            child->reset();
+        if (limit > 0 && ++counter == limit) {
+            return Status::Success;
         }
+
+        return Status::Running;
     }
 
 protected:

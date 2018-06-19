@@ -41,8 +41,8 @@ void CreatingBehaviorTreeManually()
     auto sequence = std::make_shared<BrainTree::Sequence>();
     auto sayHello = std::make_shared<Action>();
     auto sayHelloAgain = std::make_shared<Action>();
-    sequence.addChild(sayHello);
-    sequence.addChild(sayHelloAgain);
+    sequence->addChild(sayHello);
+    sequence->addChild(sayHelloAgain);
     tree.setRoot(sequence);
     tree.update();
 }

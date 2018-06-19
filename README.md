@@ -6,7 +6,7 @@ A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Be
 Features
 --------
 
-* behavior tree
+* behavior tree implementation
 * predefined composites
 * predefined decorators
 * (optional) rudimentary blackboard
@@ -21,19 +21,16 @@ Example
 -------
 
 ```c++
-// this example should print out "Hello, World!", six times
+// this example should print out "Hello, World!", four times
 #include <iostream>
-#include <BrainTree.h>
+#include "BrainTree.h"
 
 class Action : public BrainTree::Node
 {
 public:
-    Action() {}
-
     Status update() override
     {
         std::cout << "Hello, World!" << std::endl;
-
         return Node::Status::Success;
     }
 };
@@ -42,21 +39,18 @@ void CreatingBehaviorTreeManually()
 {
     BrainTree::BehaviorTree tree;
     auto sequence = std::make_shared<BrainTree::Sequence>();
-    auto actionOne = std::make_shared<Action>();
-    auto actionTwo = std::make_shared<Action>();
-    auto actionThree = std::make_shared<Action>();
-    sequence.addChild(actionOne);
-    sequence.addChild(actionTwo);
-    sequence.addChild(actionThree);
+    auto sayHello = std::make_shared<Action>();
+    auto sayHelloAgain = std::make_shared<Action>();
+    sequence.addChild(sayHello);
+    sequence.addChild(sayHelloAgain);
     tree.setRoot(sequence);
     tree.update();
 }
 
 void CreatingBehaviorTreeUsingBuilders()
 {
-    auto tree = BrainTree::TreeBuilder()
+    auto tree = BrainTree::Builder()
         .composite<BrainTree::Sequence>()
-            .leaf<Action>()
             .leaf<Action>()
             .leaf<Action>()
         .end()
@@ -67,9 +61,7 @@ void CreatingBehaviorTreeUsingBuilders()
 int main()
 {
     CreatingBehaviorTreeManually();
-
     CreatingBehaviorTreeUsingBuilders();
-
     return 0;
 }
 ```
@@ -108,7 +100,13 @@ Composites
 Builder
 -------
 
-The Builder class makes it easier to create a behavior tree. You use three methods to build your tree: `leaf<NodeType>()`, `composite<CompositeType>()` and `decorator<DecoratorType>()`. Both `composite()` and `decorator()` require a corresponding call to `end()`, this marks where you are done adding children to a composite or a child to a decorator. At the end you call `build()` which will then give you the finished behavior tree.
+The Builder class simplifies the process of creating a behavior tree. You use three methods to build your tree:
+
+* `leaf<NodeType>()`
+* `composite<CompositeType>()`
+* `decorator<DecoratorType>()`
+
+Both `composite()` and `decorator()` require a corresponding call to `end()`, this marks where you are done adding children to a composite or a child to a decorator. At the very end you call `build()` which will then give you the finished behavior tree.
 
 ```
 auto tree = Builder()

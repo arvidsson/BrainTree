@@ -123,4 +123,4 @@ auto tree = Builder()
 
 License
 -------
-MIT (c) arvidsson
+MIT (c) arvidsson 2015-2018

@@ -1,5 +1,5 @@
 // BrainTree - C++ behavior tree single header library 
-// Copyright 2017 Pär Arvidsson. All rights reserved.
+// Copyright 2015-2018 Par Arvidsson. All rights reserved.
 // Licensed under the MIT license (https://github.com/arvidsson/BrainTree/blob/master/LICENSE).
 
 #pragma once
@@ -12,7 +12,6 @@
 
 namespace BrainTree
 {
-
 
 class Node
 {
@@ -59,7 +58,6 @@ protected:
     Status status = Status::Invalid;
 };
 
-
 class Composite : public Node
 {
 public:
@@ -74,7 +72,6 @@ protected:
     std::vector<Node::Ptr>::iterator it;
 };
 
-
 class Decorator : public Node
 {
 public:
@@ -86,7 +83,6 @@ public:
 protected:
     Node::Ptr child = nullptr;
 };
-
 
 class Blackboard
 {
@@ -151,7 +147,6 @@ protected:
     std::unordered_map<std::string, std::string> strings;
 };
 
-
 class Leaf : public Node
 {
 public:
@@ -164,7 +159,6 @@ public:
 protected:
     Blackboard::Ptr blackboard;
 };
-
 
 class BehaviorTree : public Node
 {
@@ -181,7 +175,6 @@ private:
     Node::Ptr root = nullptr;
     Blackboard::Ptr blackboard = nullptr;
 };
-
 
 template <class Parent>
 class DecoratorBuilder;
@@ -302,7 +295,6 @@ private:
     Node::Ptr root;
 };
 
-
 // The Selector composite ticks each child node in order.
 // If a child succeeds or runs, the selector returns the same status.
 // In the next tick, it will try to run each child in order again.
@@ -332,7 +324,6 @@ public:
         return Status::Failure;
     }
 };
-
 
 // The Sequence composite ticks each child node in order.
 // If a child fails or runs, the sequence returns the same status.
@@ -364,7 +355,6 @@ public:
     }
 };
 
-
 // The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
 // If a child succeeds or runs, the stateful selector returns the same status.
 // In the next tick, it will try to run the next child or start from the beginning again.
@@ -391,7 +381,6 @@ public:
     }
 };
 
-
 // The StatefulSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
 // If a child fails or runs, the stateful sequence returns the same status.
 // In the next tick, it will try to run the next child or start from the beginning again.
@@ -417,7 +406,6 @@ public:
         return Status::Success;
     }
 };
-
 
 class ParallelSequence : public Composite
 {
@@ -479,7 +467,6 @@ private:
     int minFail = 0;
 };
 
-
 // The Succeeder decorator returns success, regardless of what happens to the child.
 class Succeeder : public Decorator
 {
@@ -491,7 +478,6 @@ public:
     }
 };
 
-
 // The Failer decorator returns failure, regardless of what happens to the child.
 class Failer : public Decorator
 {
@@ -502,7 +488,6 @@ public:
         return Status::Failure;
     }
 };
-
 
 // The Inverter decorator inverts the child node's status, i.e. failure becomes success and success becomes failure.
 // If the child runs, the Inverter returns the status that it is running too.
@@ -523,7 +508,6 @@ public:
         return s;
     }
 };
-
 
 // The Repeater decorator repeats infinitely or to a limit until the child returns success.
 class Repeater : public Decorator
@@ -562,7 +546,6 @@ protected:
     int counter = 0;
 };
 
-
 // The UntilSuccess decorator repeats until the child returns success and then returns success.
 class UntilSuccess : public Decorator
 {
@@ -579,7 +562,6 @@ public:
     }
 };
 
-
 // The UntilFailure decorator repeats until the child returns fail and then returns success.
 class UntilFailure : public Decorator
 {
@@ -595,6 +577,5 @@ public:
         }
     }
 };
-
 
 } // namespace BrainTree

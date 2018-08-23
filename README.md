@@ -1,7 +1,7 @@
 BrainTree
 ======
 
-A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php) header-only library.
+A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php) single header library.
 
 Features
 --------
@@ -121,4 +121,4 @@ auto tree = Builder()
 
 License
 -------
-MIT (c) arvidsson 2015-2018
+MIT (c) Pär Arvidsson 2015-2018

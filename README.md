@@ -1,9 +1,9 @@
-BrainTree
+BrainTree :
 ======
 
 A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php) single header library.
 
-Features
+Features :
 --------
 
 * behavior tree implementation
@@ -12,12 +12,12 @@ Features
 * (optional) rudimentary blackboard
 * (optional) behavior tree builders
 
-Install
+Install :
 -------
 
 Include ```BrainTree.h``` in your project.
 
-Example
+Example :
 -------
 
 ```c++
@@ -66,38 +66,38 @@ int main()
 }
 ```
 
-Composites
+Composites :
 ----------
 
-### Selector
+### Selector :
 
 * The Selector composite ticks each child node in order.
 * If a child succeeds or runs, the selector returns the same status.
 * In the next tick, it will try to run each child in order again.
 * If all children fails, only then does the selector fail.
 
-### Sequence
+### Sequence :
 
 * The Sequence composite ticks each child node in order.
 * If a child fails or runs, the sequence returns the same status.
 * In the next tick, it will try to run each child in order again.
 * If all children succeeds, only then does the sequence succeed.
 
-### StatefulSelector
+### StatefulSelector :
 
 * The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
 * If a child succeeds or runs, the stateful selector returns the same status.
 * In the next tick, it will try to run the next child or start from the beginning again.
 * If all children fails, only then does the stateful selector fail.
 
-### StatefulSequence
+### StatefulSequence :
 
 * The StatefulSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
 * If a child fails or runs, the stateful sequence returns the same status.
 * In the next tick, it will try to run the next child or start from the beginning again.
 * If all children succeeds, only then does the stateful sequence succeed.
 
-Builder
+Builder :
 -------
 
 The Builder class simplifies the process of creating a behavior tree. You use three methods to build your tree:
@@ -119,6 +119,6 @@ auto tree = Builder()
     .build();
 ```
 
-License
+License :
 -------
 MIT (c) Pär Arvidsson 2015-2018

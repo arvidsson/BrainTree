@@ -1,24 +1,20 @@
-BrainTree
-======
+# BrainTree
 
 A C++ [behavior tree](http://gamasutra.com/blogs/ChrisSimpson/20140717/221339/Behavior_trees_for_AI_How_they_work.php) single header library.
 
-Features
---------
+## Features
 
-* behavior tree implementation
-* predefined composites
-* predefined decorators
-* (optional) rudimentary blackboard
-* (optional) behavior tree builders
+- behavior tree implementation
+- predefined composites
+- predefined decorators
+- (optional) rudimentary blackboard
+- (optional) behavior tree builders
 
-Install
--------
+## Install
 
-Include ```BrainTree.h``` in your project.
+Include `BrainTree.h` in your project.
 
-Example
--------
+## Example
 
 ```c++
 // this example should print out "Hello, World!", four times
@@ -66,45 +62,33 @@ int main()
 }
 ```
 
-Composites
-----------
+## Composites
 
-### Selector
+| Composite        | Behaviour                                                                       | Success                 | Running               | Failure              |
+| ---------------- | ------------------------------------------------------------------------------- | ----------------------- | --------------------- | -------------------- |
+| Selector         | Ticks each child node in order, starting from the beginning each tick           | If a child succeeds     | If a child is running | If all children fail |
+| Sequence         | Ticks each child node in order, starting from the beginning each tick           | If all children succeed | If a child is running | If a child fails     |
+| StatefulSelector | Ticks each child node in order, starting from the child ticked in previous tick | If a child succeeds     | If a child is running | If all children fail |
+| StatefulSequence | Ticks each child node in order, starting from the child ticked in previous tick | If all children succeed | If a child is running | If a child fails     |
 
-* The Selector composite ticks each child node in order.
-* If a child succeeds or runs, the selector returns the same status.
-* In the next tick, it will try to run each child in order again.
-* If all children fails, only then does the selector fail.
+## Decorators
 
-### Sequence
+| Decorator    | Behaviour                                                 |
+| ------------ | --------------------------------------------------------- |
+| Succeeder    | Always returns success                                    |
+| Failer       | Always returns failure                                    |
+| Inverter     | Inverts the result of the child node                      |
+| Repeater     | Repeats until child node succeeds (infinitely or limited) |
+| UntilSuccess | Repeats until child node succeeds                         |
+| UntilFailure | Repeats until child node fails                            |
 
-* The Sequence composite ticks each child node in order.
-* If a child fails or runs, the sequence returns the same status.
-* In the next tick, it will try to run each child in order again.
-* If all children succeeds, only then does the sequence succeed.
-
-### StatefulSelector
-
-* The StatefulSelector composite ticks each child node in order, and remembers what child it prevously tried to tick.
-* If a child succeeds or runs, the stateful selector returns the same status.
-* In the next tick, it will try to run the next child or start from the beginning again.
-* If all children fails, only then does the stateful selector fail.
-
-### StatefulSequence
-
-* The StatefulSequence composite ticks each child node in order, and remembers what child it prevously tried to tick.
-* If a child fails or runs, the stateful sequence returns the same status.
-* In the next tick, it will try to run the next child or start from the beginning again.
-* If all children succeeds, only then does the stateful sequence succeed.
-
-Builder
--------
+## Builder
 
 The Builder class simplifies the process of creating a behavior tree. You use three methods to build your tree:
 
-* `leaf<NodeType>()`
-* `composite<CompositeType>()`
-* `decorator<DecoratorType>()`
+- `leaf<NodeType>()`
+- `composite<CompositeType>()`
+- `decorator<DecoratorType>()`
 
 Both `composite()` and `decorator()` require a corresponding call to `end()`, this marks where you are done adding children to a composite or a child to a decorator. At the very end you call `build()` which will then give you the finished behavior tree.
 
@@ -119,6 +103,6 @@ auto tree = Builder()
     .build();
 ```
 
-License
--------
+## License
+
 MIT (c) Pär Arvidsson 2015-2018

@@ -401,7 +401,7 @@ public:
 // If a child fails or runs, the stateful sequence returns the same status.
 // In the next tick, it will try to run the next child or start from the beginning again.
 // If all children succeeds, only then does the stateful sequence succeed.
-class MemSequence : public Composite
+class StatefulSequence : public Composite
 {
 public:
     Status update() override
